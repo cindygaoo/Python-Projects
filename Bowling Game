@@ -1,0 +1,62 @@
+import random
+
+def write_scores(player, first, second):
+    with open('scores.txt', 'a') as f:
+        f.write(str(player))
+        f.write('\n')
+        f.write(str(first))
+        f.write('\n')
+        f.write(str(second))
+        f.write('\n')
+
+
+def calc_total(players, score_file):
+    d = {}
+    for player in players:
+        d[player] = 0
+    
+    file = open(score_file, "r")
+
+    while True:
+        curr_player = file.readline().strip()
+        if not curr_player:
+            break
+        
+        for _ in range(2):
+            score = file.readline().strip()
+            if score != "/":
+                d[curr_player] += int(score)
+
+    print("Final")
+    for player in players:
+        print(player + " " + str(d[player]))     
+
+
+if __name__ == "__main__":
+    print("How many players?")
+    num_players = int(input())
+    players = []
+    for i in range(1, num_players + 1):
+        print("Player {} name:".format(i))
+        players.append(input())
+    print("\n")
+
+    score_file = 'scores.txt'
+
+    with open(score_file, 'w') as f:
+        pass
+
+    for i in range(1,11):
+        print("Round {}:".format(i))
+        for player in players:
+            first_roll = random.randint(0, 10)
+            if first_roll < 10:
+                second_roll = random.randint(0, 10-first_roll)
+            else:
+                second_roll = "/"
+            print(player + ": " + str(first_roll) + " " + str(second_roll))
+            write_scores(player, first_roll, second_roll)
+        print("\n")
+
+    calc_total(players, score_file)
+
