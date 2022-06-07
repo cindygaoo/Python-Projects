@@ -1,0 +1,82 @@
+import yfinance as yf, pandas as pd
+import datetime
+from pandas_datareader import data as pdr
+import yfinance as yf
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+from sklearn import linear_model
+
+start_sp = datetime.datetime(2019, 1, 1)
+end_sp = datetime.datetime(2019, 12, 31)
+
+user_input = input("Please enter a company name (Stock symbol alphabets in lowercase or uppecase only with no extra space and special characters eg: AAPL or aapl): ")
+ticker = pdr.get_data_yahoo(user_input, start_sp, end_sp)
+print(ticker.head(),"\n Total count: ", len(ticker.index))
+
+start_sp = datetime.datetime(2019, 1, 1)
+end_sp = datetime.datetime(2019, 12, 31)
+sp500 = pdr.get_data_yahoo('^GSPC', 
+                           start_sp,
+                             end_sp)
+    
+print(sp500.head(),"\nTotal count: ", len(sp500.index))
+
+ticker_change = ticker['Adj Close'].pct_change().dropna()
+sp500_change = sp500['Adj Close'].pct_change().dropna()
+ticker_df = pd.DataFrame({'Date':ticker_change.index,'ticker_change':ticker_change.values,'sp500_change':sp500_change.values})
+
+#Asset daily change
+print(ticker_change.head(),"\nTotal count: ", len(ticker_change.index))
+
+#S&P500 daily change
+print(sp500_change.head(),"\nTotal count: ", len(sp500_change.index))
+
+#Plot the daily % change for the asset
+fig = plt.figure()
+ax = fig.add_axes([2,2,2,2])
+ticks_to_use = np.arange(0,len(ticker_df),20)
+labels = [ticker_change.index[i] for i in ticks_to_use]
+ax.set_xticks(ticks_to_use)
+ax.plot(ticker_df['ticker_change'])
+ax.set_xticklabels(labels)
+plt.show()
+
+# Calculate and display the mean, standard deviation, variance, min, and max for the asset and the S&P 500.
+print("Mean for asset:", np.mean(ticker_change))
+print("Standard deviation for asset:", np.std(ticker_change))
+print("Variance for asset:", np.var(ticker_change))
+print("Min for asset:", np.min(ticker_change))
+print("Max for asset:", np.max(ticker_change))
+print("\n")
+print("Mean for sp500:", np.mean(sp500_change))
+print("Standard deviation for sp500:", np.std(sp500_change))
+print("Variance for sp500:", np.var(sp500_change))
+print("Min for sp500:", np.min(sp500_change))
+print("Max for sp500:", np.max(sp500_change))
+
+#Using scikit-learn, perform a linear regressions for the asset against the S&P 500.
+model = linear_model.LinearRegression()
+X = np.array(ticker_df['ticker_change']).reshape(-1,1)
+y = np.array(ticker_df['sp500_change']).reshape(-1,1)
+
+#X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.3)
+model = LinearRegression()
+#model.fit(X_train,y_train)
+model.fit(X,y)
+y_pred = model.predict(X)
+
+print("Intercept:", model.intercept_)
+print("Model Coefficients:", model.coef_)
+print("Mean Absolute Error:", mean_absolute_error(X, y_pred))
+print("Coefficient of Determination:", r2_score(X, y_pred))
+
+#Plot the samples and the linear model. Label the Y axis as S&P 500 and the X axis as each asset.
+%matplotlib inline
+plt.xlabel('Asset',fontsize=20)
+plt.ylabel('price',fontsize=20)
+plt.scatter(ticker_df.ticker_change,ticker_df.sp500_change,color='red',marker='+')
+plt.plot(ticker_df.ticker_change,model.predict(X),color='blue')
