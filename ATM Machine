@@ -1,0 +1,70 @@
+money = 0
+
+while True:
+    print("Welcome to the ATM bank")
+    print("1. Make a deposit")
+    print("2. Make a withdrawal")
+    print("3. Get balance information")
+    print("4. Exit")
+    choice=int(input("Please choose from the following options:"))
+                
+    if choice == 1:
+        print("Your balance is:$",money)
+        while True:
+            if money==0:
+                deposit=float(input("Your balance is $0. You will need to deposit $100 or more"))
+            else:
+                deposit=float(input("How much would you like to deposit?")) 
+                
+            print("Previous balance:$",money)
+            print("Deposited:$",deposit)
+            money+=deposit
+            print("This is your current balance:$",money)
+            
+            decision=input("would you like to deposit more? Y/N:")
+            if decision == "y":
+                continue 
+            else:
+                break
+
+    if choice == 2:
+        print("Your balance is:$",money)
+        while True:
+            withdrawal=float(input("Please enter withdraw amount:$"))
+            if withdrawal > money:
+                print("Your account has insuffient funds. Please withdraw less than your current balance!")
+                withdrawal=float(input("You need to withdrawal less than your balance. How much would you like to withdraw:$"))
+                 
+            print("Previous balance:$",money)
+            print("Withdrew:$",withdrawal)
+            money-=withdrawal
+            print("This is your current balance:$",money)
+            decision=input("would you like to withdraw more? Y/N:")
+            if decision == "y":
+                continue 
+            else: 
+                break
+
+    if choice == 3:
+        print("This is your current balance:",money)
+        dec=input("would you like to make another transaction? Y/N:")
+        if decision == "y":
+            continue     
+        else:
+            print("Have a nice day!")
+            break
+
+    if choice == 4:
+        exit=input("Would you like to exit? Y/N:")
+        if exit=="n":
+            continue
+        else:
+            print("Have a nice day!")
+            break
+
+    transaction=input("Would you like to do another transaction? Y/N:")
+    if transaction =="y":
+        continue
+    else:
+        print("Have a nice day!")
+        break
